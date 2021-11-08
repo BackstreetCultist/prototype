@@ -20,8 +20,8 @@ public class CppExposedHeuristic {
         protected Callback() { allocate(); }
         private native void allocate();
 
-        public @Name("cppExposedHeuristic") int call(String str) {
-            return runMaximiseXSquared();
+        public @Name("cppExposedHeuristic") String call(String heuristic, String solution) {
+            return (solution + String.valueOf(runMaximiseXSquared()));
         }
 
         private int runMaximiseXSquared() {
