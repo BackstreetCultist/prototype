@@ -28,6 +28,8 @@ type SolutionPopulation = [Solution]
 type TheTypeFormerlyKnownAsSolution = (HeuristicRepresentation, SolutionObjectiveValue)
 type TheTypeFormerlyKnownAsPopulation = [TheTypeFormerlyKnownAsSolution]
 
+
+-- ------------------------------JAVA INTERFACE --------------------------------------------------------- --
 -- impure function
 foreign import ccall "JavaCPP_init" c_javacpp_init :: CInt -> Ptr (Ptr CString) -> IO ()
 javacpp_init :: IO ()
@@ -39,13 +41,18 @@ cppExposedHeuristic :: HeuristicRepresentation -> SolutionRepresentation -> Stri
 cppExposedHeuristic h s = unsafePerformIO(peekCAString (c_cppExposedHeuristic (unsafePerformIO(newCString h)) (unsafePerformIO(newCString s))))
 --remember to free this C string afterwards
 
+
+-- ------------------------------HELPER FUNCTIONS ------------------------------------------------------- --
 --These helper functions will be very useful
 getAllHeuristicRepresentations :: HeuristicPopulation -> [HeuristicRepresentation]
 getAllHeuristicRepresentations hs = Data.List.map fst hs
 
-
 getAllSolutionRepresentations :: SolutionPopulation -> [SolutionRepresentation]
 getAllSolutionRepresentations sols = Data.List.map fst sols
+
+--Gets a random index in a list
+getRandomIndex :: StdGen -> [a] -> Int
+getRandomIndex g xs = fst (uniformR (0, length xs - 1) g)
 
 --This helper function to shuffle a list is from https://wiki.haskell.org/Random_shuffle
 fisherYatesStep :: RandomGen g => (Map Int a, g) -> (Int, a) -> (Map Int a, g)
@@ -78,9 +85,7 @@ generateEightBitString gen = do
     Data.List.take 8  (randomRs ('0', '1') gen)
 
 
-
-
--- ------------------------------APPLYING HEURISTICS ------------------------------------------- --
+-- ------------------------------APPLYING HEURISTICS ---------------------------------------------------- --
 --Apply a set of heuristics to a set of solutions
 --Score heuristics based on performance
 applyHeuristicPopulation :: HeuristicPopulation -> SolutionPopulation -> (HeuristicPopulation, SolutionPopulation)
@@ -110,21 +115,23 @@ scoreHeuristic h s s' = if snd s' > snd s then
                         else
                           (fst h, (snd h) - 1)
 
---Test a set of heuristics, and store their SOVs
--- testPopulation :: TheTypeFormerlyKnownAsPopulation -> TheTypeFormerlyKnownAsPopulation
--- testPopulation = map (runHeuristic . fst)
--- testPopulation xs = map runHeuristic (map fst xs)
 
+-- ------------------------------EVOLVE HEURISTICS ------------------------------------------------------ --
 --Choose two parents from the current population
--- selectParents :: TheTypeFormerlyKnownAsPopulation -> (HeuristicRepresentation, HeuristicRepresentation)
--- selectParents xs = (fst(ys !! 2), fst(ys !! 3))
---                     where
---                       ys = sortBy (comparing snd) xs
---Naive solution - choose two best
+selectParents :: HeuristicPopulation -> (HeuristicRepresentation, HeuristicRepresentation)
+selectParents hs = (fst(ys !! 2), fst(ys !! 3))
+                    where
+                      ys = sortBy (comparing snd) hs
+-- Naive solution - choose two best
 
--- --From two parents, create two new child heuristics
--- evolveHeuristics :: (HeuristicRepresentation, HeuristicRepresentation) -> (HeuristicRepresentation, HeuristicRepresentation)
--- --TODO implement
+--From two parents, create two new child heuristics
+evolveHeuristics :: (HeuristicRepresentation, HeuristicRepresentation) -> (HeuristicRepresentation, HeuristicRepresentation)
+evolveHeuristics (p1, p2) = (c1, c2)
+                          where
+                            c1 = Data.List.take i p1 ++ Data.List.drop i p2
+                            c2 = Data.List.take i p2 ++ Data.List.drop i p1
+                            i = getRandomIndex (mkStdGen 4) p1
+--Performs One-Point Crossover at a "random" index
 
 -- --Choose a heuristic from the current population to undergo mutation
 -- selectMutateHeuristic :: TheTypeFormerlyKnownAsPopulation -> HeuristicRepresentation
@@ -141,9 +148,6 @@ scoreHeuristic h s s' = if snd s' > snd s then
 --                       (a, c) = splitAt x h
 --                       x = getRandomIndex h
 -- note - use Objective Value as seed?
-
--- getRandomIndex :: [a] -> Int
--- getRandomIndex xs = 
 
 -- --Bit Flipper helper function to mutate heuristics
 -- flipBit :: Char -> Char
