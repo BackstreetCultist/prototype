@@ -5,23 +5,21 @@ import org.bytedeco.javacpp.annotation.Platform;
 import java.util.Random;
 
 @Platform(library="hyperHeuristic")
-public class RandomBitFlip implements MoveMaker{
+public class InvertBits implements MoveMaker{
 
     /**
-     * Flips a random bit
+     * Flips all bits
      * @param solution
      * @return
      */
     @Override
     public String makeMove(String solution) {
-        int index = new Random().nextInt(solution.length());
+        int index1 = new Random().nextInt(solution.length());
+        int index2 = new Random().nextInt(solution.length());
         char[] solutionChars = solution.toCharArray();
-        if (solutionChars[index] == '0'){
-            solutionChars[index] = '1';
-        }
-        else {
-            solutionChars[index] = '0';
-        }
+        char buffer = solutionChars[index1];
+        solutionChars[index1] = solutionChars[index2];
+        solutionChars[index2] = buffer;
         return String.valueOf(solutionChars);
     }
 }
