@@ -4,13 +4,11 @@ import org.bytedeco.javacpp.annotation.Platform;
 
 import java.util.Random;
 
-
 @Platform(library="hyperHeuristic")
-public class NaiveAcceptor implements MoveAcceptor {
+public class PositiveAcceptor implements MoveAcceptor {
 
     /**
-     * Returns true if the new objective value is higher, or otherwise with a
-     * fifty-fifty chance.
+     * Returns true if the objective value is higher
      * @param baselineObjectiveValue
      * @param newObjectiveValue
      * @return
@@ -21,13 +19,7 @@ public class NaiveAcceptor implements MoveAcceptor {
             return true;
         }
         else {
-            int randomAcceptance = new Random().nextInt(2);
-            if (randomAcceptance == 1){
-                return true;
-            }
-            else {
-                return false;
-            }
+            return false;
         }
     }
 }

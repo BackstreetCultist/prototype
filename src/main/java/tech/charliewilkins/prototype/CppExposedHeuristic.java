@@ -21,21 +21,10 @@ public class CppExposedHeuristic {
         private native void allocate();
 
         public @Name("cppExposedHeuristic") String call(String heuristic, String solutionRepresentation) {
-            // return (solution + String.valueOf(runMaximiseXSquared()));
             Solution solution = new MaximiseXSquaredSolution(solutionRepresentation);
             Solution newSolution = run(solution, new RandomBitFlip(), new NaiveAcceptor(), 1);
             return (newSolution.getSolution() + newSolution.getObjectiveValue(newSolution.getSolution()));
         }
-
-        // private int runMaximiseXSquared() {
-        //     String initialSolution = generateInitialSolution();
-
-        //     MoveAcceptor naiveAcceptor = new NaiveAcceptor();
-        //     MoveMaker randomBitFlip = new RandomBitFlip();
-        //     Solution  maximiseXSquaredSolution = new MaximiseXSquaredSolution(initialSolution);
-
-        //     return run(maximiseXSquaredSolution, randomBitFlip, naiveAcceptor, 50);
-        // }
 
         private Solution run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor, int iterations) {
             int baselineObjectiveValue;
