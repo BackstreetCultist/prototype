@@ -87,8 +87,8 @@ generateEightBitString gen = do
 -- ------------------------------APPLYING HEURISTICS ---------------------------------------------------- --
 --Apply a set of heuristics to a set of solutions
 --Score heuristics based on performance
-applyHeuristicPopulation :: HeuristicPopulation -> SolutionPopulation -> (HeuristicPopulation, SolutionPopulation)
-applyHeuristicPopulation hs sols = unzip (zipWith (curry applyHeuristic) hsShuffled sols)
+applyHeuristicPopulation :: (HeuristicPopulation, SolutionPopulation) -> (HeuristicPopulation, SolutionPopulation)
+applyHeuristicPopulation (hs, sols) = unzip (zipWith (curry applyHeuristic) hsShuffled sols)
                                   where
                                     hsShuffled = fst (fisherYates (mkStdGen (snd(head sols))) hs) --Shuffle list based on one of the OVs
 
@@ -169,8 +169,38 @@ setScores :: [HeuristicRepresentation] -> HeuristicPopulation
 setScores [] = []
 setScores hs = (head hs, 0) : setScores (tail hs)
 
+
+-- ------------------------------CONTROL CODE ----------------------------------------------------------- --
 main :: IO ()
 main = do
   javacpp_init
-  print $ cppExposedHeuristic "Hello" "World"
-  -- print $ generateHeuristicSet
+  let heuristics = generateHeuristicPopulation
+  print "Initial Heuristic Set:"
+  print heuristics
+  let solutions = generateSolutionPopulation
+  print "Initial Solution Set:"
+  print solutions
+  putStrLn ""
+  putStrLn ""
+  print "Running:"
+  let returnedData = runEvolutionaryCycles 10 (heuristics, solutions)
+  let heuristics = fst returnedData
+  let solutions = snd returnedData
+  print "New Heuristic Set:"
+  print heuristics
+  print "New Solution Set:"
+  print solutions
+  putStrLn ""
+  putStrLn ""
+  print "Done!"
+
+testAndEvaluate :: Int -> (HeuristicPopulation, SolutionPopulation) -> (HeuristicPopulation, SolutionPopulation)
+testAndEvaluate 0 dat = dat
+testAndEvaluate x dat = testAndEvaluate (x-1) (applyHeuristicPopulation dat)
+
+runEvolutionaryCycles :: Int -> (HeuristicPopulation, SolutionPopulation) -> (HeuristicPopulation, SolutionPopulation)
+runEvolutionaryCycles 0 dat = dat
+runEvolutionaryCycles x (hs, sols) = runEvolutionaryCycles (x-1) (evolvedHs, newSols)
+                                    where
+                                      evolvedHs = evolveHeuristicPopulation scoredHs
+                                      (scoredHs, newSols) = testAndEvaluate 5 (hs, sols)

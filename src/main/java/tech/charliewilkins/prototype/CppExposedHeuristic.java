@@ -20,21 +20,24 @@ public class CppExposedHeuristic {
         protected Callback() { allocate(); }
         private native void allocate();
 
-        public @Name("cppExposedHeuristic") String call(String heuristic, String solution) {
-            return (solution + String.valueOf(runMaximiseXSquared()));
+        public @Name("cppExposedHeuristic") String call(String heuristic, String solutionRepresentation) {
+            // return (solution + String.valueOf(runMaximiseXSquared()));
+            Solution solution = new MaximiseXSquaredSolution(solutionRepresentation);
+            Solution newSolution = run(solution, new RandomBitFlip(), new NaiveAcceptor(), 1);
+            return (newSolution.getSolution() + newSolution.getObjectiveValue(newSolution.getSolution()));
         }
 
-        private int runMaximiseXSquared() {
-            String initialSolution = generateInitialSolution();
+        // private int runMaximiseXSquared() {
+        //     String initialSolution = generateInitialSolution();
 
-            MoveAcceptor naiveAcceptor = new NaiveAcceptor();
-            MoveMaker randomBitFlip = new RandomBitFlip();
-            Solution  maximiseXSquaredSolution = new MaximiseXSquaredSolution(initialSolution);
+        //     MoveAcceptor naiveAcceptor = new NaiveAcceptor();
+        //     MoveMaker randomBitFlip = new RandomBitFlip();
+        //     Solution  maximiseXSquaredSolution = new MaximiseXSquaredSolution(initialSolution);
 
-            return run(maximiseXSquaredSolution, randomBitFlip, naiveAcceptor, 50);
-        }
+        //     return run(maximiseXSquaredSolution, randomBitFlip, naiveAcceptor, 50);
+        // }
 
-        private int run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor, int iterations) {
+        private Solution run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor, int iterations) {
             int baselineObjectiveValue;
             int newObjectiveValue;
             String baselineSolution;
@@ -56,7 +59,7 @@ public class CppExposedHeuristic {
             System.out.println();
             System.out.println("***PROGRAM TERMINATED");
             System.out.println("Heuristic solution = " + solution.getSolution() + " with objective value = " + solution.getObjectiveValue(solution.getSolution()));
-            return solution.getObjectiveValue(solution.getSolution());
+            return solution;
         }
 
         private String generateInitialSolution() {
