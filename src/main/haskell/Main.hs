@@ -121,15 +121,15 @@ evolveHeuristicPopulation :: HeuristicPopulation -> HeuristicPopulation
 evolveHeuristicPopulation hs = do
                               let g = mkStdGen (snd(head hs))
                               let sortedhs = sortBy (comparing snd) hs
-                              let (c1, c2) = evolveHeuristics (fst (sortedhs !! ((length sortedhs) -1)), fst (sortedhs !! ((length sortedhs) -2)))
+                              let (c1, c2) = evolveHeuristics (fst (sortedhs !! (length sortedhs -1)), fst (sortedhs !! (length sortedhs -2)))
                               let (shuffledNonParents, g2) = fisherYates g (tail (tail (reverse sortedhs)))
                               let mutatedHeuristic = mutateHeuristic g2 (fst (head shuffledNonParents))
-                              let newHeuristicRepresentationSet = [c1] ++ [c2] ++ [mutatedHeuristic] ++ (getAllHeuristicRepresentations (tail shuffledNonParents))
+                              let newHeuristicRepresentationSet = c1 : c2 : mutatedHeuristic : getAllHeuristicRepresentations (tail shuffledNonParents)
                               setScores newHeuristicRepresentationSet
 
 --Choose two parents from the current population
 selectParents :: HeuristicPopulation -> (HeuristicRepresentation, HeuristicRepresentation)
-selectParents hs = (fst(ys !! ((length ys) -2)), fst(ys !! ((length ys) -1)))
+selectParents hs = (fst(ys !! (length ys -2)), fst(ys !! (length ys -1)))
                     where
                       ys = sortBy (comparing snd) hs
 -- Naive solution - choose two best
