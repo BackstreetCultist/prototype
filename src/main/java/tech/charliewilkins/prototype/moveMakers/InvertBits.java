@@ -14,12 +14,15 @@ public class InvertBits implements MoveMaker{
      */
     @Override
     public String makeMove(String solution) {
-        int index1 = new Random().nextInt(solution.length());
-        int index2 = new Random().nextInt(solution.length());
         char[] solutionChars = solution.toCharArray();
-        char buffer = solutionChars[index1];
-        solutionChars[index1] = solutionChars[index2];
-        solutionChars[index2] = buffer;
+        for (int i = 0; i < solutionChars.length; i++){
+            if (solutionChars[i] == '0'){
+                solutionChars[i] = '1';
+            }
+            else {
+                solutionChars[i] = '0';
+            }
+        }
         return String.valueOf(solutionChars);
     }
 }

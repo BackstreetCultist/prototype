@@ -14,8 +14,12 @@ public class SwapBits implements MoveMaker{
      */
     @Override
     public String makeMove(String solution) {
+        int index1 = new Random().nextInt(solution.length());
+        int index2 = new Random().nextInt(solution.length());
         char[] solutionChars = solution.toCharArray();
-
+        char buffer = solutionChars[index1];
+        solutionChars[index1] = solutionChars[index2];
+        solutionChars[index2] = buffer;
         return String.valueOf(solutionChars);
     }
 }

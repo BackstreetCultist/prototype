@@ -22,8 +22,31 @@ public class CppExposedHeuristic {
             Solution solution = new MaximiseXSquaredSolution(solutionRepresentation);
             MoveMaker moveMaker = generateMoveMaker(heuristic);
             MoveAcceptor moveAcceptor = generateMoveAcceptor(heuristic);
-            Solution newSolution = run(solution, moveMaker, moveAcceptor, 1);
+            System.out.println("\nHeuristic provided was: " + heuristic);
+            System.out.println("MoveMaker generated was: " + moveMaker.getClass().getSimpleName());
+            System.out.println("MoveAcceptor generated was: " + moveAcceptor.getClass().getSimpleName());
+            Solution newSolution = run(solution, moveMaker, moveAcceptor);
+            System.out.println("New Solution is: " + newSolution.getSolution());
+            System.out.println("New Value is: " + newSolution.getObjectiveValue(newSolution.getSolution()) + "\n");
             return (newSolution.getSolution() + newSolution.getObjectiveValue(newSolution.getSolution()));
+        }
+
+        private Solution run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor) {
+            int baselineObjectiveValue;
+            int newObjectiveValue;
+            String baselineSolution;
+            String newSolution;
+            baselineSolution = solution.getSolution();
+            System.out.println("Original Solution was: " + baselineSolution);
+            baselineObjectiveValue = solution.getObjectiveValue(baselineSolution);
+            System.out.println("Original Value was: " + baselineObjectiveValue);
+            newSolution = moveMaker.makeMove(solution.getSolution());
+            newObjectiveValue = solution.getObjectiveValue(newSolution);
+            if (moveAcceptor.acceptMove(baselineObjectiveValue, newObjectiveValue)) {
+                solution.setSolution(newSolution);
+            }
+
+            return solution;
         }
 
         private MoveMaker generateMoveMaker(String heuristic) {
@@ -54,31 +77,6 @@ public class CppExposedHeuristic {
                 default:
                     return new PositiveOrEqualAcceptor();
             }
-        }
-
-        private Solution run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor, int iterations) {
-            int baselineObjectiveValue;
-            int newObjectiveValue;
-            String baselineSolution;
-            String newSolution;
-            for (int i = 0; i < iterations; i++){
-                System.out.println();
-                System.out.println("***RUN " + i + " STARTING***");
-                baselineSolution = solution.getSolution();
-                baselineObjectiveValue = solution.getObjectiveValue(baselineSolution);
-                System.out.println("Initial solution = " + baselineSolution + " with objective value = " + baselineObjectiveValue);
-                System.out.println("Making move");
-                newSolution = moveMaker.makeMove(solution.getSolution());
-                newObjectiveValue = solution.getObjectiveValue(newSolution);
-                System.out.println("Proposed solution = " + newSolution + " with objective value = " + newObjectiveValue);
-                if (moveAcceptor.acceptMove(baselineObjectiveValue, newObjectiveValue)) {
-                    solution.setSolution(newSolution);
-                }
-            }
-            System.out.println();
-            System.out.println("***PROGRAM TERMINATED");
-            System.out.println("Heuristic solution = " + solution.getSolution() + " with objective value = " + solution.getObjectiveValue(solution.getSolution()));
-            return solution;
         }
     }
 }
