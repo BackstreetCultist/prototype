@@ -2,10 +2,8 @@ package tech.charliewilkins.prototype;
 
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;
-import tech.charliewilkins.prototype.moveAcceptors.MoveAcceptor;
-import tech.charliewilkins.prototype.moveAcceptors.NaiveAcceptor;
-import tech.charliewilkins.prototype.moveMakers.MoveMaker;
-import tech.charliewilkins.prototype.moveMakers.RandomBitFlip;
+import tech.charliewilkins.prototype.moveAcceptors.*;
+import tech.charliewilkins.prototype.moveMakers.*;
 import tech.charliewilkins.prototype.solutions.MaximiseXSquaredSolution;
 import tech.charliewilkins.prototype.solutions.Solution;
 
@@ -22,8 +20,40 @@ public class CppExposedHeuristic {
 
         public @Name("cppExposedHeuristic") String call(String heuristic, String solutionRepresentation) {
             Solution solution = new MaximiseXSquaredSolution(solutionRepresentation);
-            Solution newSolution = run(solution, new RandomBitFlip(), new NaiveAcceptor(), 1);
+            MoveMaker moveMaker = generateMoveMaker(heuristic);
+            MoveAcceptor moveAcceptor = generateMoveAcceptor(heuristic);
+            Solution newSolution = run(solution, moveMaker, moveAcceptor, 1);
             return (newSolution.getSolution() + newSolution.getObjectiveValue(newSolution.getSolution()));
+        }
+
+        private MoveMaker generateMoveMaker(String heuristic) {
+            String moveMakerString = heuristic.substring(0, 4);
+            int moveMakerCode = Integer.parseInt(moveMakerString, 2);
+            switch (moveMakerCode % 4){
+                case 0:
+                    return new InvertBits();
+                case 1:
+                    return new RandomBitFlip();
+                case 2:
+                    return new ReverseSolution();
+                default:
+                    return new SwapBits();
+            }
+        }
+
+        private MoveAcceptor generateMoveAcceptor(String heuristic) {
+            String moveAcceptorString = heuristic.substring(4, 8);
+            int moveAcceptorCode = Integer.parseInt(moveAcceptorString, 2);
+            switch (moveAcceptorCode % 4){
+                case 0:
+                    return new AutomaticAcceptor();
+                case 1:
+                    return new NaiveAcceptor();
+                case 2:
+                    return new PositiveAcceptor();
+                default:
+                    return new PositiveOrEqualAcceptor();
+            }
         }
 
         private Solution run(Solution solution, MoveMaker moveMaker, MoveAcceptor moveAcceptor, int iterations) {
@@ -49,21 +79,6 @@ public class CppExposedHeuristic {
             System.out.println("***PROGRAM TERMINATED");
             System.out.println("Heuristic solution = " + solution.getSolution() + " with objective value = " + solution.getObjectiveValue(solution.getSolution()));
             return solution;
-        }
-
-        private String generateInitialSolution() {
-            char[] initialSolution = new char[8];
-            Random rand = new Random();
-            for (int i = 0; i < 8; i++){
-                if (rand.nextBoolean() == true){
-                    initialSolution[i] = '0';
-                }
-                else {
-                    initialSolution[i] = '1';
-                }
-            }
-            System.out.println("Initial Solution was " + String.valueOf(initialSolution));
-            return String.valueOf(initialSolution);
         }
     }
 }
