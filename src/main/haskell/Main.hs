@@ -9,7 +9,6 @@ import Data.Map
 import Control.Monad
 import Foreign.C -- get the C types
 import Foreign.Ptr (Ptr,nullPtr)
-import HsSyn (resultVariableName)
 
 
 
@@ -116,10 +115,21 @@ scoreHeuristic h s s' = if snd s' > snd s then
                           (fst h, (snd h) - 1)
 
 
--- ------------------------------EVOLVE HEURISTICS ------------------------------------------------------ --
+-- ------------------------------EVOLVING HEURISTICS ---------------------------------------------------- --
+--Create a new HeuristicPopulation by evolving the HeuristicRepresentations
+evolveHeuristicPopulation :: HeuristicPopulation -> HeuristicPopulation
+evolveHeuristicPopulation hs = do
+                              let g = mkStdGen (snd(head hs))
+                              let sortedhs = sortBy (comparing snd) hs
+                              let (c1, c2) = evolveHeuristics (fst (sortedhs !! ((length sortedhs) -1)), fst (sortedhs !! ((length sortedhs) -2)))
+                              let (shuffledNonParents, g2) = fisherYates g (tail (tail (reverse sortedhs)))
+                              let mutatedHeuristic = mutateHeuristic g2 (fst (head shuffledNonParents))
+                              let newHeuristicRepresentationSet = [c1] ++ [c2] ++ [mutatedHeuristic] ++ (getAllHeuristicRepresentations (tail shuffledNonParents))
+                              setScores newHeuristicRepresentationSet
+
 --Choose two parents from the current population
 selectParents :: HeuristicPopulation -> (HeuristicRepresentation, HeuristicRepresentation)
-selectParents hs = (fst(ys !! 2), fst(ys !! 3))
+selectParents hs = (fst(ys !! ((length ys) -2)), fst(ys !! ((length ys) -1)))
                     where
                       ys = sortBy (comparing snd) hs
 -- Naive solution - choose two best
@@ -133,27 +143,31 @@ evolveHeuristics (p1, p2) = (c1, c2)
                             i = getRandomIndex (mkStdGen 4) p1
 --Performs One-Point Crossover at a "random" index
 
--- --Choose a heuristic from the current population to undergo mutation
--- selectMutateHeuristic :: TheTypeFormerlyKnownAsPopulation -> HeuristicRepresentation
--- --TODO implement
+--Choose a heuristic from the current population to undergo mutation
+selectMutateHeuristic :: StdGen -> HeuristicPopulation -> HeuristicRepresentation
+selectMutateHeuristic g hs = reps !! x
+                          where
+                            x = getRandomIndex g reps
+                            reps = getAllHeuristicRepresentations hs
+--Selects a random HeuristicRepresentation to be mutated
 
 -- --Mutate a heuristic
--- mutateHeuristic :: HeuristicRepresentation -> HeuristicRepresentation
--- --TODO implement
+mutateHeuristic :: StdGen -> HeuristicRepresentation -> HeuristicRepresentation
+mutateHeuristic g hr = Data.List.take x hr ++ [flipBit (hr !! x)] ++ Data.List.drop (x+1) hr
+                    where
+                      x = getRandomIndex g hr
+--Performs one random bit flip
 
+--Bit Flipper helper function to mutate heuristics
+flipBit :: Char -> Char
+flipBit '0' = '1'
+flipBit '1' = '0'
+flipBit _ = '0' --TODO do I need this?
 
--- mutateHeuristic :: HeuristicRepresentation -> HeuristicRepresentation
--- mutateHeuristic h = a ++ b ++ c
---                     where
---                       (a, c) = splitAt x h
---                       x = getRandomIndex h
--- note - use Objective Value as seed?
-
--- --Bit Flipper helper function to mutate heuristics
--- flipBit :: Char -> Char
--- flipBit '0' = '1'
--- flipBit '1' = '0'
--- flipBit _ = '0' --TODO do I need this?
+--Helper function to attach initial scores to a set of HRs
+setScores :: [HeuristicRepresentation] -> HeuristicPopulation
+setScores [] = []
+setScores hs = (head hs, 0) : setScores (tail hs)
 
 main :: IO ()
 main = do

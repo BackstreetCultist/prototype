@@ -1,3 +1,4 @@
+-------------------------------------TESTING GENERATING AND APPLYING HEURISTIC POPULATION----------------
 bash haskellTest.sh - Compiled fine
 javacpp_init - no output (good)
 generateHeuristicPopulation - [("00001101",0),("11110010",0),("10011000",0),("10000100",0)]
@@ -13,3 +14,12 @@ out' - ([("10000100",2),("10011000",2),("00001101",2),("11110010",2)],[("1101101
 out'' = applyHeuristicPopulation [("10000100",2),("10011000",2),("00001101",2),("11110010",2)] [("11011010",33489),("11011000",62500),("10010010",24025),("10000101",60025)]
 out'' - Java, various
 out'' - ([("10000100",1),("10011000",3),("00001101",1),("11110010",1)],[("11011010",4624),("11011000",64009),("10010010",11664),("10000101",57121)])
+
+-------------------------------------TESTING EVOLVING HEURISTIC POPULATION-------------------------------
+bash haskellTest.sh - Compiled fine
+javacpp_init - no output (good)
+x = [("10000100",1),("10011000",3),("00001101",1),("11110010",1)] - all good
+evolveHeuristicPopulation x - [("10011010",0),("11110000",0),("00011101",0),("10000100",0)]
+    Chosen parents were 10011000 and 11110010 with crossover at index 4 producing 10011010 and 11110000
+    Mutated heuristic was 00001101 producing 00011101
+    10000100 did not evolve or mutate
