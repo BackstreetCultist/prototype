@@ -1,0 +1,25 @@
+\documentclass[11pt]{article}
+\usepackage{cite}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\title{Prototype Hyper-Heuristic System Reflective Notes}
+\author{Charlie Wilkins}
+\date{\today}
+
+\begin{document}
+	\maketitle
+	
+	The following are notes on the successes and failures of the prototype implementation of HyFI, which was completed on [] with one key addition made afterwards (see below).
+
+	\begin{itemize}
+		\item The most important success of the prototype is that it features Java components integrated with Haskell ones. This was also the most difficult part of constructing the prototype, which uses the JavaCPP library to cross-compile Java code into a C Shared Object and associated headers which are then accessed via Haskell's Foreign Function Interface. Due to this being a "cross-build" situation, the prototype uses a series of bash scripts rather than a more advanced system such as Gradle for Java or Stack for Haskell. I predict that, while difficult to figure out at first, this approach is robust and usable enough to form the basis for the main project.
+		\item Beyond the integration of the two languages, the prototype also shows that the project is feasible - the Domain Barrier is implemented fully, allowing solutions and heuristics to be passed between the two, and the heuristics are evolved and applied in a working manner. The full prototype is demonstrably more effective than running the Java code directly.
+		\item The key limitation of the Java code is a lack of flexibility in heuristics - they are only composed of two components, each of which has only four implementations, giving a hard limit of 16 possible heuristics. The eventual system should try to have a greater diversity of components and implementations, as well as possibly magnitudes for components (e.g. implementing k-point rather than 1-point crossover).
+		\item On the hyper-heuristic/Haskell side, the system is hampered by the naivety of the implementation. Theoretically, hyper-heuristics can be classified as Selectional or Generational, however the prototype implements a Generational HH in a Selectional manner. This is an ineffective and non-standard approach which was taken due to time constraints and a lack of an overall system design, which the prototype will be a key factor in developing.
+		\item One final element of the prototype worth mentioning is that, after completion, I took the extra step of Docker-ising the system. This greatly increases system robustness and portability, and - while in accordance with best practices no code will be re-used for the eventual project - the repository itself can be effectively re-used to supply an effective foundation for new development. 
+	\end{itemize}
+
+	In conclusion, the prototype has had two key positive effects on the system going forward. Firstly, the Java/Haskell integration and Docker platform provide an extrenely useful base of prior knowledge and tooling to begin development of the new system, and secondly it will be a great help towards specifying this new system, largely by trying to account for the flaws apparent in the prototype.
+
+\end{document}
