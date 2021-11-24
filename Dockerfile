@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     cabal-install \
     dos2unix
-RUN cabal update && cabal install --lib random
+RUN cabal update && cabal install --lib random && cabal install --lib QuickCheck
 WORKDIR /prototype
 COPY . .
 RUN find . -type f | xargs dos2unix
