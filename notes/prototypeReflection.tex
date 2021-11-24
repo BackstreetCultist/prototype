@@ -10,7 +10,7 @@
 \begin{document}
 	\maketitle
 	
-	The following are notes on the successes and failures of the prototype implementation of HyFI, which was completed on [] with one key addition made afterwards (see below).
+	The following are notes on the successes and failures of the prototype implementation of HyFI, which was completed on 10.11 with one key addition made afterwards (see below).
 
 	\begin{itemize}
 		\item The most important success of the prototype is that it features Java components integrated with Haskell ones. This was also the most difficult part of constructing the prototype, which uses the JavaCPP library to cross-compile Java code into a C Shared Object and associated headers which are then accessed via Haskell's Foreign Function Interface. Due to this being a "cross-build" situation, the prototype uses a series of bash scripts rather than a more advanced system such as Gradle for Java or Stack for Haskell. I predict that, while difficult to figure out at first, this approach is robust and usable enough to form the basis for the main project.
