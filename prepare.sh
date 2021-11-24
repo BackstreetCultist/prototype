@@ -5,4 +5,4 @@ mv javacpp-1.5.6.jar javacpp.jar
 javac -cp javacpp.jar tech/charliewilkins/prototype/CppExposedHeuristic.java tech/charliewilkins/prototype/**/*.java
 java -jar javacpp.jar tech/charliewilkins/prototype/CppExposedHeuristic -header
 cp ../haskell/Main.hs .
-ghc --make -package random Main.hs tech/charliewilkins/prototype/linux-x86_64/libhyperHeuristic.so
+ghc --make Main.hs tech/charliewilkins/prototype/linux-x86_64/libhyperHeuristic.so
